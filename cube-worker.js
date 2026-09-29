@@ -1,0 +1,6 @@
+importScripts('https://cdn.jsdelivr.net/npm/cubejs@1.3.2/lib/cube.js');
+importScripts('https://cdn.jsdelivr.net/npm/cubejs@1.3.2/lib/solve.js');
+let ready=false;
+function init(){try{Cube.initSolver();ready=true;self.postMessage({type:'ready'})}catch(error){self.postMessage({type:'error',message:'Não foi possível preparar o solver.'})}}
+self.onmessage=function(event){const data=event.data||{};if(data.type!=='solve')return;if(!ready){self.postMessage({type:'error',message:'O solver ainda está preparando as tabelas.'});return}try{const cube=Cube.fromString(data.state);if(cube.asString()!==data.state)throw new Error('Estado inválido');let solution='';if(!cube.isSolved())solution=cube.solve()||'';const verify=Cube.fromString(data.state);if(solution.trim())verify.move(solution);if(!verify.isSolved())throw new Error('A solução calculada não validou o estado atual.');self.postMessage({type:'solution',solution:solution.trim()})}catch(error){self.postMessage({type:'error',message:error?.message||'Falha ao resolver o cubo.'})}};
+init();
