@@ -1,4 +1,4 @@
-const CACHE='dexter-games-v4';
+const CACHE='dexter-games-v5';
 const CORE=['/','/index.html','/cube.html','/chess.html','/checkers.html','/domino.html','/puzzle.html','/assets/base.css','/js/audio.js','/js/peer-room.js','/js/game-core.js','/js/checkers-engine.js','/js/domino-engine.js','/js/puzzle-engine.js','/manifest.webmanifest','/icon.svg'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
