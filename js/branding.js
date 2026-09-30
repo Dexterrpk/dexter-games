@@ -6,7 +6,7 @@
     meta.content=BRAND;
   }
   function ensureProUI(){
-    if(document.querySelector('link[data-neri-pro-ui]'))return;
+    if(document.querySelector('link[href*="/assets/pro-ui.css"]'))return;
     const link=document.createElement('link');
     link.rel='stylesheet';link.href='/assets/pro-ui.css';link.dataset.neriProUi='1';
     document.head.appendChild(link);
