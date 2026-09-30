@@ -2,6 +2,10 @@
 
 Hub de jogos web mobile-first com estética dark/neon, publicado como site estático e sem cadastro obrigatório.
 
+## Desenvolvimento
+
+**Desenvolvido e mantido por NeriInfotech.**
+
 ## Jogos
 
 - **Cubo Mágico 3×3** — 3D, gestos por linha/coluna/camada, embaralhar, desfazer e solver.
@@ -62,6 +66,7 @@ O projeto não exige build.
 │   └── base.css
 └── js/
     ├── audio.js
+    ├── branding.js
     ├── peer-room.js
     ├── game-core.js
     ├── checkers-engine.js
