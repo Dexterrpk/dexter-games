@@ -1,4 +1,4 @@
-const CACHE='dexter-games-v13';
+const CACHE='dexter-games-v14';
 const CORE=['/','/index.html','/cube.html','/chess.html','/checkers.html','/domino.html','/puzzle.html','/assets/base.css','/assets/pro-ui.css','/js/audio.js','/js/branding.js','/js/peer-room.js','/js/game-core.js','/js/checkers-engine.js','/js/domino-engine.js','/js/puzzle-engine.js','/manifest.webmanifest','/icon.svg'];
 
 async function withBranding(response,request){
