@@ -19,6 +19,21 @@
 .cube-status span:last-child{flex:0 0 auto;color:var(--muted);font-size:.64rem}
 .cube-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:8px}
 .solver-hidden{display:none!important}
+.tutorial-btn{position:absolute;right:10px;top:10px;z-index:8;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(8,8,16,.72);border:1px solid rgba(255,255,255,.13);color:#fff;font-weight:900;font-size:.9rem;backdrop-filter:blur(10px)}
+.tutorial{position:fixed;inset:0;z-index:220;display:grid;align-items:end;background:rgba(3,3,8,.62);backdrop-filter:blur(6px);padding-top:max(18px,env(safe-area-inset-top))}
+.tutorial[hidden]{display:none}
+.tutorial-sheet{width:min(100%,620px);max-height:min(78dvh,720px);margin:0 auto;background:#11111c;border:1px solid rgba(255,255,255,.11);border-radius:22px 22px 0 0;box-shadow:0 -22px 60px rgba(0,0,0,.42);overflow:hidden;padding-bottom:max(10px,env(safe-area-inset-bottom))}
+.tutorial-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07)}
+.tutorial-head h2{margin:0;font-size:1.02rem}.tutorial-head p{margin:2px 0 0;color:var(--muted);font-size:.62rem}
+.tutorial-close{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid var(--line)}
+.tutorial-body{overflow:auto;max-height:calc(min(78dvh,720px) - 65px);padding:10px 12px 16px;display:grid;gap:8px}
+.tutorial-note{padding:9px 10px;border-radius:12px;background:rgba(138,92,255,.08);border:1px solid rgba(138,92,255,.16);font-size:.64rem;line-height:1.4;color:#d9d2ff}
+.tutorial-step{border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.035);overflow:hidden}
+.tutorial-step summary{list-style:none;cursor:pointer;padding:10px 11px;display:flex;align-items:center;gap:9px;font-size:.73rem;font-weight:850}
+.tutorial-step summary::-webkit-details-marker{display:none}.step-n{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;background:rgba(102,227,180,.12);border:1px solid rgba(102,227,180,.18);color:#cffff0;font-size:.66rem;flex:0 0 auto}
+.step-content{padding:0 11px 11px;color:#b8b8c8;font-size:.65rem;line-height:1.45}.step-content p{margin:0 0 7px}.step-content strong{color:#f2f2f7}
+.algos{display:grid;gap:6px}.algo{padding:8px 9px;border-radius:10px;background:#090911;border:1px solid rgba(255,255,255,.08)}.algo small{display:block;color:#89899b;font-size:.56rem;margin-bottom:3px;text-transform:uppercase;letter-spacing:.08em}.algo code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#fff;font-size:.72rem;white-space:normal;word-spacing:.12em}
+.notation{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-top:7px}.notation span{padding:6px;border-radius:8px;background:rgba(255,255,255,.035);text-align:center;font-size:.58rem;color:#bdbdca}
 @media(max-width:600px){
  .viewer{height:min(62dvh,520px);min-height:360px}
  .cube-dash{padding:8px}
@@ -34,7 +49,7 @@
 <main class="shell">
 <header class="topbar"><a class="back-link" href="/">←</a><div class="brand"><div class="brand-mark">🧩</div><div><small>dexter games • 3d</small><h1>Cubo Mágico 3×3</h1></div></div><button class="icon-btn" id="soundBtn">🔊</button></header>
 <section class="panel cube-panel">
-<div class="viewer" id="viewer"><div class="gesture" id="gesture">Camada selecionada</div><div class="hint" id="hint">Arraste uma face para mover • arraste fora do cubo para girar livre</div></div>
+<div class="viewer" id="viewer"><button class="tutorial-btn" id="tutorialBtn" aria-label="Tutorial de resolução">?</button><div class="gesture" id="gesture">Camada selecionada</div><div class="hint" id="hint">Arraste uma face para mover • arraste fora do cubo para girar livre</div></div>
 <div class="cube-dash">
 <div class="status cube-status"><span id="status">Arraste uma face para jogar.</span><span id="count">0 movimentos</span></div>
 <div class="cube-actions"><button class="btn primary" id="scramble">🔀 Embaralhar</button><button class="btn good" id="solve" disabled>✨ Resolver</button><button class="btn" id="undo">↶ Desfazer</button><button class="btn" id="reset">↺ Resetar</button></div>
@@ -42,13 +57,65 @@
 </div>
 </section>
 </main>
+<div class="tutorial" id="tutorial" hidden>
+  <div class="tutorial-sheet" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle">
+    <div class="tutorial-head">
+      <div><h2 id="tutorialTitle">Resolver por camadas</h2><p>Método iniciante • 7 etapas</p></div>
+      <button class="tutorial-close" id="tutorialClose" aria-label="Fechar tutorial">✕</button>
+    </div>
+    <div class="tutorial-body">
+      <div class="tutorial-note"><strong>Notação:</strong> U = cima, D = baixo, R = direita, L = esquerda, F = frente. <strong>'</strong> significa giro anti-horário e <strong>2</strong> significa 180°. Os giros são sempre vistos de frente para a face indicada.</div>
+
+      <details class="tutorial-step" open>
+        <summary><span class="step-n">1</span> Cruz branca</summary>
+        <div class="step-content"><p>Comece com o <strong>centro branco para cima</strong>. Leve as quatro arestas brancas até a face branca e, antes de encaixar cada uma, alinhe a cor lateral com o centro da mesma cor.</p><p>Essa etapa é principalmente intuitiva: procure uma aresta branca, alinhe a outra cor ao centro e gire a face necessária para formar a cruz.</p></div>
+      </details>
+
+      <details class="tutorial-step">
+        <summary><span class="step-n">2</span> Cantos brancos • 1ª camada</summary>
+        <div class="step-content"><p>Mantenha o <strong>branco para cima</strong>. Coloque o canto branco abaixo do local onde ele deve entrar, na posição frente-direita-baixo, e repita o gatilho até encaixar.</p><div class="algos"><div class="algo"><small>Gatilho do canto</small><code>R' D' R D</code></div></div><p>Repita para os quatro cantos. Ao terminar, toda a camada branca deve estar resolvida e as laterais alinhadas.</p></div>
+      </details>
+
+      <details class="tutorial-step">
+        <summary><span class="step-n">3</span> Camada do meio</summary>
+        <div class="step-content"><p>Agora <strong>vire o cubo inteiro</strong>: branco para baixo e amarelo para cima. Procure no topo uma aresta sem amarelo, alinhe sua cor da frente com o centro e escolha se ela entra à direita ou à esquerda.</p><div class="algos"><div class="algo"><small>Entra à direita</small><code>U R U' R' U' F' U F</code></div><div class="algo"><small>Entra à esquerda</small><code>U' L' U L U F U' F'</code></div></div></div>
+      </details>
+
+      <details class="tutorial-step">
+        <summary><span class="step-n">4</span> Cruz amarela</summary>
+        <div class="step-content"><p>Com amarelo para cima, observe se existe ponto, “L” ou linha. Faça o algoritmo até formar a cruz. Na linha, deixe-a horizontal; no “L”, deixe o L no canto superior esquerdo.</p><div class="algos"><div class="algo"><small>Cruz amarela</small><code>F R U R' U' F'</code></div></div></div>
+      </details>
+
+      <details class="tutorial-step">
+        <summary><span class="step-n">5</span> Alinhar arestas amarelas</summary>
+        <div class="step-content"><p>Gire U até identificar as arestas da cruz que ainda não combinam com os centros laterais. Posicione as duas que precisam trocar na frente e à esquerda.</p><div class="algos"><div class="algo"><small>Troca de arestas</small><code>R U R' U R U2 R' U</code></div></div><p>Se as duas erradas estiverem opostas, execute uma vez, reposicione U e repita.</p></div>
+      </details>
+
+      <details class="tutorial-step">
+        <summary><span class="step-n">6</span> Posicionar cantos amarelos</summary>
+        <div class="step-content"><p>Procure um canto que já esteja no lugar correto, mesmo que esteja girado. Coloque esse canto em <strong>frente-direita-cima</strong> e execute o algoritmo.</p><div class="algos"><div class="algo"><small>Ciclar 3 cantos</small><code>U R U' L' U R' U' L</code></div></div><p>Se nenhum canto estiver certo, faça uma vez de qualquer posição e procure novamente.</p></div>
+      </details>
+
+      <details class="tutorial-step">
+        <summary><span class="step-n">7</span> Orientar cantos amarelos</summary>
+        <div class="step-content"><p>Deixe um canto amarelo errado em <strong>frente-direita-cima</strong>. Repita o algoritmo até o amarelo desse canto ficar para cima. Depois gire <strong>somente U</strong> para trazer o próximo canto errado e repita.</p><div class="algos"><div class="algo"><small>Orientar o canto</small><code>R' D' R D</code></div></div><p>O cubo vai parecer desorganizado durante o processo. Não gire o cubo inteiro entre os cantos; mova apenas U até terminar.</p></div>
+      </details>
+
+      <div class="tutorial-note"><strong>Dica:</strong> nas etapas 3–7 mantenha branco embaixo e amarelo em cima. A rotação livre do app não conta como movimento.</div>
+    </div>
+  </div>
+</div>
 <script type="module">
 import*as THREE from'three';
 import{OrbitControls}from'three/addons/controls/OrbitControls.js';
 import{wireSoundButton,sfx,toast}from'/js/audio.js';
 wireSoundButton(document.getElementById('soundBtn'));
 const CubeClass=window.Cube;if(!CubeClass)throw new Error('cube.js não carregou');
-const viewer=document.getElementById('viewer'),statusEl=document.getElementById('status'),countEl=document.getElementById('count'),solutionEl=document.getElementById('solution'),solverState=document.getElementById('solverState'),gestureEl=document.getElementById('gesture'),hintEl=document.getElementById('hint'),scrambleBtn=document.getElementById('scramble'),solveBtn=document.getElementById('solve'),undoBtn=document.getElementById('undo'),resetBtn=document.getElementById('reset');
+const viewer=document.getElementById('viewer'),statusEl=document.getElementById('status'),countEl=document.getElementById('count'),solutionEl=document.getElementById('solution'),solverState=document.getElementById('solverState'),gestureEl=document.getElementById('gesture'),hintEl=document.getElementById('hint'),scrambleBtn=document.getElementById('scramble'),solveBtn=document.getElementById('solve'),undoBtn=document.getElementById('undo'),resetBtn=document.getElementById('reset'),tutorial=document.getElementById('tutorial'),tutorialBtn=document.getElementById('tutorialBtn'),tutorialClose=document.getElementById('tutorialClose');
+tutorialBtn.addEventListener('click',()=>{tutorial.hidden=false;document.body.style.overflow='hidden';sfx.tap()});
+tutorialClose.addEventListener('click',()=>{tutorial.hidden=true;document.body.style.overflow=''});
+tutorial.addEventListener('click',e=>{if(e.target===tutorial){tutorial.hidden=true;document.body.style.overflow=''}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!tutorial.hidden){tutorial.hidden=true;document.body.style.overflow=''}});
 const moveButtons=[];
 let cube=new CubeClass(),history=[],busy=false,solverReady=false,solutionTokens=[],solutionStep=-1;
 const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(34,1,.1,100),renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
